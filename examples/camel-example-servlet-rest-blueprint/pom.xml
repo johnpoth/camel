@@ -28,7 +28,7 @@
   <artifactId>camel-example-servlet-rest-blueprint</artifactId>
   <name>Camel :: Example :: Servlet REST Blueprint</name>
   <description>An example using Servlet REST with OSGi Blueprint</description>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
 
   <dependencies>
 

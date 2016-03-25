@@ -25,7 +25,7 @@
 
   <artifactId>camel-example-netty-myapp-two</artifactId>
   <name>Camel :: Example :: Netty HTTP :: My Application Two</name>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
 
   <build>
     <plugins>

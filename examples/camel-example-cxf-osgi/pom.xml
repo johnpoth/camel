@@ -28,7 +28,7 @@
 	<artifactId>camel-example-cxf-osgi</artifactId>
 	<name>Camel :: Example :: CXF :: OSGI</name>
 	<description>An example which use a CXF consumer and the OSGI HTTP Service</description>
-	<packaging>bundle</packaging>
+	<packaging>jar</packaging>
 
 	<dependencies>
 		<dependency>

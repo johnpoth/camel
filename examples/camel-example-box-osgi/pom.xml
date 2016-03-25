@@ -28,7 +28,7 @@
 	<artifactId>camel-example-box-osgi</artifactId>
 	<name>Camel :: Example :: Box :: OSGI</name>
 	<description>An example which use a Box Endpoint in OSGi</description>
-	<packaging>bundle</packaging>
+	<packaging>jar</packaging>
 
 	<dependencies>
 		<dependency>

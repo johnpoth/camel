@@ -37,4 +37,14 @@
   <dependencies>
   </dependencies>
 
+  <build>
+    <plugins>
+      <!-- Invoke the maven-jar-plugin from the parent POM. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

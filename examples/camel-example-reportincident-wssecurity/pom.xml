@@ -30,7 +30,7 @@
   <description>An example based on real life use case for reporting incidents using webservice that are transformed
       and send as emails to a backing system. Client calling the WebService is authentified through WS-Security
   </description>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   
 	<dependencies>
 		<dependency>

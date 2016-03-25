@@ -27,7 +27,7 @@
   <artifactId>camel-spring</artifactId>
   <name>Camel :: Spring</name>
   <description>Camel Spring support</description>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
 
   <properties>
       <!-- spring-dm only supports spring 3.x so we need to import that range -->

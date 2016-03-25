@@ -27,7 +27,7 @@
   </parent>
 
   <artifactId>camel-core</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <name>Camel :: Core</name>
   <description>The Core Camel Java DSL based router</description>
 
@@ -213,6 +213,12 @@
         </plugins>
     </pluginManagement>
     <plugins>
+      
+      <!-- Invoke the maven-jar-plugin from the parent POM. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+      </plugin>
 
       <!-- shade concurrent hashmap for faster Camel and spi-annotations as needed by everybody -->
       <plugin>

@@ -25,7 +25,7 @@
 
   <artifactId>camel-example-netty-http-shared</artifactId>
   <name>Camel :: Example :: Netty HTTP :: Shared Netty HTTP Server</name>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
 
   <build>
     <plugins>

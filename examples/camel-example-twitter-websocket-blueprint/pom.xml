@@ -28,7 +28,7 @@
   <artifactId>camel-example-twitter-websocket-blueprint</artifactId>
   <name>Camel :: Example :: Twitter WebSocket using OSGi Blueprint</name>
   <description>An example that pushes new tweets to a web page using web-socket</description>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
 
   <!-- there is no maven dependencies needed as the Camel application has no Java code,
        and its all defined in the src/main/resources/OSGI-INF/blueprint/camel-twitter.xml file -->
