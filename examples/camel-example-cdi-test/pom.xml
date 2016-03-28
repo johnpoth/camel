@@ -28,6 +28,10 @@
   <name>Camel :: Example :: CDI :: Testing</name>
   <description>An example illustrating Camel CDI testing features</description>
 
+  <properties>
+    <camel.osgi.skip>true</camel.osgi.skip>
+  </properties>
+
   <dependencies>
 
     <!-- CDI API -->

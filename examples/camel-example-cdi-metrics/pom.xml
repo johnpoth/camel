@@ -31,6 +31,10 @@
   <description>Dropwizard Metrics CDI example</description>
   <packaging>jar</packaging>
 
+  <properties>
+    <camel.osgi.skip>true</camel.osgi.skip>
+  </properties>
+
   <dependencies>
 
     <!-- CDI API -->

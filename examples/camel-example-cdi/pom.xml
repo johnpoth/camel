@@ -28,6 +28,10 @@
   <name>Camel :: Example :: CDI</name>
   <description>An example showing how to work with Camel and CDI for dependency injection</description>
 
+  <properties>
+    <camel.osgi.skip>true</camel.osgi.skip>
+  </properties>
+
   <dependencies>
 
     <!-- CDI API -->

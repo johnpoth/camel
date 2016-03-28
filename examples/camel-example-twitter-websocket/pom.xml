@@ -30,6 +30,10 @@
   <name>Camel :: Example :: Twitter WebSocket</name>
   <description>An example that pushes new tweets to a web page using web-socket</description>
 
+  <properties>
+    <camel.osgi.skip>true</camel.osgi.skip>
+  </properties>
+
   <dependencies>
 
     <dependency>

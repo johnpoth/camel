@@ -29,6 +29,10 @@
 	<name>Camel :: Example :: JMS-File</name>
 	<description>An example that persists messages from JMS to files</description>
 
+    <properties>
+      <camel.osgi.skip>true</camel.osgi.skip>
+    </properties>
+
 	<dependencies>
 
     <!-- Camel dependencies -->

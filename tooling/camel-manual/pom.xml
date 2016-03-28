@@ -84,12 +84,6 @@
         </plugins>
     </pluginManagement>
     <plugins>
-        <!-- Invoke the maven-jar-plugin from the parent POM. -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-        </plugin>
-        
         <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>

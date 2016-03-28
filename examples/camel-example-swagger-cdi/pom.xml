@@ -28,6 +28,10 @@
   <name>Camel :: Example :: Swagger CDI</name>
   <description>An example using REST DSL and Swagger Java with CDI</description>
 
+  <properties>
+    <camel.osgi.skip>true</camel.osgi.skip>
+  </properties>
+
   <dependencies>
 
     <!-- CDI API -->

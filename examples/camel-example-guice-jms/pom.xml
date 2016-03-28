@@ -28,6 +28,10 @@
     <name>Camel :: Example :: Guice :: JMS</name>
     <description>An example showing how to work with Camel, Guice and JMS</description>
 
+    <properties>
+      <camel.osgi.skip>true</camel.osgi.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.camel</groupId>

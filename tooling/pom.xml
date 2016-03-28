@@ -31,6 +31,10 @@
   <description>Camel Tooling</description>
   <packaging>pom</packaging>
 
+  <properties>
+    <camel.osgi.skip>true</camel.osgi.skip>
+  </properties>
+
   <modules>
     <module>parent</module>
     <module>spi-annotations</module>

@@ -30,6 +30,10 @@
     <name>Camel :: Example :: FTP</name>
     <description>An example for showing Camel FTP integration</description>
 
+    <properties>
+      <camel.osgi.skip>true</camel.osgi.skip>
+    </properties>
+
     <dependencies>
 
         <dependency>

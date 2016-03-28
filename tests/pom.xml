@@ -31,6 +31,10 @@
   <description>Camel Integration Tests</description>
   <packaging>pom</packaging>
 
+  <properties>
+    <camel.osgi.skip>true</camel.osgi.skip>
+  </properties>
+
   <modules>
     <module>test-bundles</module>
     <module>camel-itest-standalone</module>
@@ -41,16 +45,6 @@
     <module>camel-partial-classpath-test</module>
     <module>camel-typeconverterscan-test</module>
   </modules>
-
-  <build>
-    <plugins>
-      <!-- Invoke the maven-jar-plugin from the parent POM. -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 
   <profiles>
     <!-- includes these modules when doing the release -->

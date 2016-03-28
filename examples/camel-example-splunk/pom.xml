@@ -29,6 +29,10 @@
   <name>Camel :: Example :: Splunk</name>
   <description>An example using Splunk</description>
 
+  <properties>
+    <camel.osgi.skip>true</camel.osgi.skip>
+  </properties>
+
   <dependencies>
 
     <dependency>

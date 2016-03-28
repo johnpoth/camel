@@ -29,6 +29,10 @@
   <artifactId>camel-spring-boot</artifactId>
   <description>Camel :: Spring Boot</description>
 
+  <properties>
+    <camel.osgi.skip>true</camel.osgi.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>

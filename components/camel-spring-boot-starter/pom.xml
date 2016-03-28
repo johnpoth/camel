@@ -29,6 +29,10 @@
   <name>Camel :: Spring Boot :: Starter</name>
   <description>Spring Boot Apache Camel Starter</description>
 
+  <properties>
+    <camel.osgi.skip>true</camel.osgi.skip>
+  </properties>
+
   <dependencies>
 
     <dependency>

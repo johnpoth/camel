@@ -30,6 +30,10 @@
   <name>Camel :: Example :: Console</name>
   <description>An example that reads input from the console</description>
 
+  <properties>
+    <camel.osgi.skip>true</camel.osgi.skip>
+  </properties>
+
   <dependencies>
 
     <dependency>
