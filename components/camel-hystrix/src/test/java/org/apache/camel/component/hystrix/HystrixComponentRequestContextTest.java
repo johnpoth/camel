@@ -34,16 +34,7 @@ import org.apache.camel.impl.SimpleRegistry;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
 
-public class HystrixComponentRequestContextTest extends CamelTestSupport {
-
-    @Produce(uri = "direct:start")
-    protected ProducerTemplate template;
-
-    @EndpointInject(uri = "mock:result")
-    protected MockEndpoint resultEndpoint;
-
-    @EndpointInject(uri = "mock:error")
-    protected MockEndpoint errorEndpoint;
+public class HystrixComponentRequestContextTest extends HystrixComponentBase {
 
     @Test
     public void invokesCachedEndpointWithCustomRequestContext() throws Exception {
@@ -53,7 +44,7 @@ public class HystrixComponentRequestContextTest extends CamelTestSupport {
         HystrixRequestContext customContext = HystrixRequestContext.initializeContext();
         final Map headers = new HashMap<>();
         headers.put("key", "cachedKey");
-        headers.put(HystrixConstants.CAMEL_HYSTRIX_REQUEST_CONTEXT_KEY, customContext);
+        headers.put(HystrixConstants.CAMEL_HYSTRIX_REQUEST_CONTEXT, customContext);
 
         template.sendBodyAndHeaders("body", headers);
 
@@ -79,7 +70,7 @@ public class HystrixComponentRequestContextTest extends CamelTestSupport {
         HystrixRequestContext customContext = HystrixRequestContext.initializeContext();
         final Map headers = new HashMap<>();
         headers.put("key", "cachedKey");
-        headers.put(HystrixConstants.CAMEL_HYSTRIX_REQUEST_CONTEXT_KEY, customContext);
+        headers.put(HystrixConstants.CAMEL_HYSTRIX_REQUEST_CONTEXT, customContext);
 
         template.sendBodyAndHeaders("body", headers);
 
@@ -87,16 +78,6 @@ public class HystrixComponentRequestContextTest extends CamelTestSupport {
 
         template.sendBodyAndHeaders("body", headers);
         assertMockEndpointsSatisfied();
-    }
-
-    @Override
-    protected CamelContext createCamelContext() throws Exception {
-        SimpleRegistry registry = new SimpleRegistry();
-        CamelContext context = new DefaultCamelContext(registry);
-        registry.put("run", context.getEndpoint("direct:run"));
-        registry.put("fallback", context.getEndpoint("direct:fallback"));
-        registry.put("headerExpression", ExpressionBuilder.headerExpression("key"));
-        return context;
     }
 
     @Override

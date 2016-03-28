@@ -16,30 +16,12 @@
  */
 package org.apache.camel.component.hystrix;
 
-import org.apache.camel.CamelContext;
-import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.camel.Produce;
-import org.apache.camel.ProducerTemplate;
-import org.apache.camel.builder.ExpressionBuilder;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.impl.SimpleRegistry;
-import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
 
-public class HystrixComponentCircuitBreakerTest extends CamelTestSupport {
-
-    @Produce(uri = "direct:start")
-    protected ProducerTemplate template;
-
-    @EndpointInject(uri = "mock:result")
-    protected MockEndpoint resultEndpoint;
-
-    @EndpointInject(uri = "mock:error")
-    protected MockEndpoint errorEndpoint;
+public class HystrixComponentCircuitBreakerTest extends HystrixComponentBase {
 
     @Test
     public void circuitBreakerRejectsWhenTresholdReached() throws Exception {
@@ -61,16 +43,6 @@ public class HystrixComponentCircuitBreakerTest extends CamelTestSupport {
             }
         }
         assertMockEndpointsSatisfied();
-    }
-
-    @Override
-    protected CamelContext createCamelContext() throws Exception {
-        SimpleRegistry registry = new SimpleRegistry();
-        CamelContext context = new DefaultCamelContext(registry);
-        registry.put("run", context.getEndpoint("direct:run"));
-        registry.put("fallback", context.getEndpoint("direct:fallback"));
-        registry.put("headerExpression", ExpressionBuilder.headerExpression("key"));
-        return context;
     }
 
     @Override

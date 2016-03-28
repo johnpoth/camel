@@ -16,26 +16,20 @@
  */
 package org.apache.camel.itest.karaf;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.Configuration;
-import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 
 @RunWith(PaxExam.class)
-@Deprecated
-public class CamelJetty8Test extends AbstractFeatureTest {
+@Ignore("Need a new hystrix SMX bundle")
+public class CamelHystrixTest extends AbstractFeatureTest {
 
-    public static final String COMPONENT = extractName(CamelJetty8Test.class);
+    public static final String COMPONENT = extractName(CamelHystrixTest.class);
 
     @Test
     public void test() throws Exception {
-        testComponent("jetty");
-    }
-
-    @Configuration
-    public static Option[] configure() {
-        return configure(COMPONENT);
+        testComponent(COMPONENT);
     }
 
 }
