@@ -39,7 +39,7 @@ public abstract class ApiMethodParser<T> {
     public static final Pattern ARGS_PATTERN = Pattern.compile("\\s*([^<\\s]+)\\s*(<[^>]+>)?\\s+([^\\s,]+)\\s*,?");
 
     private static final String METHOD_PREFIX = "^(\\s*(public|final|synchronized|native)\\s+)*(\\s*<[^>]>)?\\s*(\\S+)\\s+([^\\(]+\\s*)\\(";
-    private static final Pattern METHOD_PATTERN = Pattern.compile("\\s*([^<\\s]+)\\s*(<[^>]+>)?\\s+(\\S+)\\s*\\(\\s*([\\S\\s,]*)\\)\\s*;?\\s*");
+    private static final Pattern METHOD_PATTERN = Pattern.compile("\\s*([^<\\s]+)?\\s*(<[^>]+>)?(<(?<generic>\\S+)\\s+extends\\s+(?<type>\\S+)>\\s+\\k<generic>)?\\s+(\\S+)\\s*\\(\\s*(?<signature>[\\S\\s,]*)\\)\\s*;?\\s*");
 
     private static final String JAVA_LANG = "java.lang.";
     private static final Map<String, Class<?>> PRIMITIVE_TYPES;
@@ -117,23 +117,39 @@ public abstract class ApiMethodParser<T> {
                 throw new IllegalArgumentException("Invalid method signature " + signature);
             }
 
+
+            String generic = null;
+            String genericType = null;
+            try {
+                generic = methodMatcher.group("generic");
+                genericType = methodMatcher.group("type");
+            } catch (IllegalArgumentException e){
+                // ignore
+            }
+
             // ignore generic type parameters in result, if any
-            final Class<?> resultType = forName(methodMatcher.group(1));
-            final String name = methodMatcher.group(3);
-            final String argSignature = methodMatcher.group(4);
+            final Class<?> resultType = generic != null ? forName(genericType) : forName(methodMatcher.group(1));
+            // do group naming
+            final String name = methodMatcher.group(6);
+            final String argSignature = methodMatcher.group(7);
 
             final List<ApiMethodArg> arguments = new ArrayList<>();
             final List<Class<?>> argTypes = new ArrayList<>();
 
             final Matcher argsMatcher = ARGS_PATTERN.matcher(argSignature);
             while (argsMatcher.find()) {
-
-                final Class<?> type = forName(argsMatcher.group(1));
+                String typeGroup = argsMatcher.group(1);
+                if ( generic != null && generic.equals(typeGroup) ) {
+                    typeGroup = genericType;
+                }
+                final Class<?> type = forName(typeGroup);
                 argTypes.add(type);
-
-                final String typeArgsGroup = argsMatcher.group(2);
-                final String typeArgs = typeArgsGroup != null
+                String typeArgsGroup = argsMatcher.group(2);
+                String typeArgs = typeArgsGroup != null
                     ? typeArgsGroup.substring(1, typeArgsGroup.length() - 1).replaceAll(" ", "") : null;
+                if ( typeArgs != null && typeArgs.equals(generic)) {
+                    typeArgs = genericType;
+                }
                 arguments.add(new ApiMethodArg(argsMatcher.group(3), type, typeArgs));
             }
 
