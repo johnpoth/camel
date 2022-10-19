@@ -22,8 +22,12 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.ResourceGoneException;
+import io.restassured.RestAssured;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelExecutionException;
+import org.apache.camel.component.platform.http.vertx.VertxPlatformHttpServer;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.test.AvailablePortFinder;
 import org.apache.camel.test.infra.fhir.services.FhirService;
 import org.apache.camel.test.infra.fhir.services.FhirServiceFactory;
 import org.apache.camel.test.junit5.CamelTestSupport;
@@ -33,6 +37,8 @@ import org.hl7.fhir.r4.model.Patient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
+
+import org.apache.camel.component.platform.http.vertx.VertxPlatformHttpServerConfiguration;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -94,6 +100,13 @@ public abstract class AbstractFhirTestSupport extends CamelTestSupport {
         final FhirComponent component = new FhirComponent(context);
         component.setConfiguration(configuration);
         context.addComponent("fhir", component);
+
+        int port = AvailablePortFinder.getNextAvailable();
+        VertxPlatformHttpServerConfiguration conf = new VertxPlatformHttpServerConfiguration();
+        conf.setBindPort(port);
+
+        RestAssured.port = port;
+        context.addService(new VertxPlatformHttpServer(conf));
         return context;
     }
 
