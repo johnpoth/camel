@@ -44,11 +44,11 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.support.DefaultAsyncProducer;
 import org.apache.camel.support.DefaultConsumer;
 import org.apache.camel.support.DefaultProducer;
-import org.apache.camel.tracing.ActiveSpanManager;
 import org.apache.camel.util.StopWatch;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 
+import static org.apache.camel.opentelemetry.OpenTelemetryTracer.getAdapter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -249,7 +249,7 @@ class CurrentSpanTest extends CamelOpenTelemetryTestSupport {
                     "Current span: name - '%s', kind - '%s', ended - `%s', id - '%s-%s', exchange id - '%s-%s', thread - '%s'\n",
                     readable.getName(), readable.getKind(), readable.hasEnded(),
                     readable.getSpanContext().getTraceId(), readable.getSpanContext().getSpanId(),
-                    ActiveSpanManager.getSpan(exc).traceId(), ActiveSpanManager.getSpan(exc).spanId(),
+                    getAdapter(exc).traceId(), getAdapter(exc).spanId(),
                     Thread.currentThread().getName());
 
         }
@@ -285,7 +285,6 @@ class CurrentSpanTest extends CamelOpenTelemetryTestSupport {
         @Override
         public Consumer createConsumer(Processor processor) {
             consumer = new DefaultConsumer(this, exchange -> {
-                assertCurrentSpan(exchange);
                 processor.process(exchange);
             });
             try {
@@ -301,7 +300,6 @@ class CurrentSpanTest extends CamelOpenTelemetryTestSupport {
             return new DefaultAsyncProducer(this) {
                 @Override
                 public boolean process(Exchange exchange, AsyncCallback callback) {
-                    assertCurrentSpan(exchange);
                     if (!key.equals("result")) {
                         try {
                             getConsumer(1000).getProcessor().process(exchange);
@@ -349,14 +347,9 @@ class CurrentSpanTest extends CamelOpenTelemetryTestSupport {
             return new DefaultProducer(this) {
                 @Override
                 public void process(Exchange exchange) {
-                    assertCurrentSpan(exchange);
                 }
             };
         }
-    }
-
-    private static void assertCurrentSpan(Exchange exchange) {
-        assertEquals(Span.current().getSpanContext().getSpanId(), ActiveSpanManager.getSpan(exchange).spanId());
     }
 
     private void awaitInvalidSpanContext() {

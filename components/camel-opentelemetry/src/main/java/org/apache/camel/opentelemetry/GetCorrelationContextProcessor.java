@@ -22,10 +22,11 @@ import org.apache.camel.Traceable;
 import org.apache.camel.spi.IdAware;
 import org.apache.camel.spi.RouteIdAware;
 import org.apache.camel.support.AsyncProcessorSupport;
-import org.apache.camel.tracing.ActiveSpanManager;
 import org.apache.camel.util.ObjectHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.apache.camel.opentelemetry.OpenTelemetryTracer.getAdapter;
 
 public class GetCorrelationContextProcessor extends AsyncProcessorSupport implements Traceable, IdAware, RouteIdAware {
 
@@ -44,9 +45,9 @@ public class GetCorrelationContextProcessor extends AsyncProcessorSupport implem
     @Override
     public boolean process(Exchange exchange, AsyncCallback callback) {
         try {
-            OpenTelemetrySpanAdapter camelSpan = (OpenTelemetrySpanAdapter) ActiveSpanManager.getSpan(exchange);
-            if (camelSpan != null) {
-                String item = camelSpan.getContextPropagationItem(keyName);
+            OpenTelemetrySpanAdapter span = getAdapter(exchange);
+            if (span != null) {
+                String item = span.getContextPropagationItem(keyName);
                 exchange.getMessage().setHeader(headerName, item);
             } else {
                 LOG.warn("OpenTelemetry: Cannot find managed span for exchange: {}", exchange);

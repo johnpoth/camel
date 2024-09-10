@@ -27,8 +27,12 @@ import org.apache.camel.Processor;
 import org.apache.camel.spi.InterceptStrategy;
 import org.apache.camel.support.PatternHelper;
 import org.apache.camel.support.processor.DelegateAsyncProcessor;
-import org.apache.camel.tracing.ActiveSpanManager;
 import org.apache.camel.tracing.SpanDecorator;
+
+import static org.apache.camel.opentelemetry.OpenTelemetryTracer.Holder;
+import static org.apache.camel.opentelemetry.OpenTelemetryTracer.getHolder;
+import static org.apache.camel.opentelemetry.OpenTelemetryTracer.setHolder;
+import static org.apache.camel.opentelemetry.OpenTelemetryTracer.unsetHolder;
 
 public class OpenTelemetryTracingStrategy implements InterceptStrategy {
 
@@ -48,8 +52,6 @@ public class OpenTelemetryTracingStrategy implements InterceptStrategy {
             throws Exception {
         if (shouldTrace(processorDefinition)) {
             return new PropagateContextAndCreateSpan(processorDefinition, target);
-        } else if (isPropagateContext()) {
-            return new PropagateContext(target);
         } else {
             return new DelegateAsyncProcessor(target);
         }
@@ -74,81 +76,40 @@ public class OpenTelemetryTracingStrategy implements InterceptStrategy {
 
         @Override
         public void process(Exchange exchange) throws Exception {
-            Span span = null;
-            OpenTelemetrySpanAdapter spanWrapper = (OpenTelemetrySpanAdapter) ActiveSpanManager.getSpan(exchange);
-            if (spanWrapper != null) {
-                span = spanWrapper.getOpenTelemetrySpan();
+            Context context = null;
+            Holder holder = getHolder(exchange);
+            if (holder != null) {
+                context = holder.getContext();
             }
 
-            if (span == null) {
-                target.process(exchange);
-                return;
+            if (context == null) {
+                context = Context.root();
             }
 
             final Span processorSpan = tracer.getTracer().spanBuilder(getOperationName(processorDefinition))
-                    .setParent(Context.current().with(span))
+                    .setParent(context)
                     .setAttribute("component", getComponentName(processorDefinition))
                     .startSpan();
 
             boolean activateExchange = !(target instanceof GetCorrelationContextProcessor
                     || target instanceof SetCorrelationContextProcessor);
 
+            Holder child = new Holder(holder, context.with(processorSpan));
             if (activateExchange) {
-                ActiveSpanManager.activate(exchange, new OpenTelemetrySpanAdapter(processorSpan));
+                setHolder(exchange, child);
             }
 
             try (Scope ignored = processorSpan.makeCurrent()) {
                 target.process(exchange);
             } catch (Exception ex) {
-                span.setStatus(StatusCode.ERROR);
-                span.recordException(ex);
+                processorSpan.setStatus(StatusCode.ERROR);
+                processorSpan.recordException(ex);
                 throw ex;
             } finally {
                 if (activateExchange) {
-                    ActiveSpanManager.deactivate(exchange);
+                    unsetHolder(exchange, child);
                 }
                 processorSpan.end();
-            }
-        }
-    }
-
-    private static class PropagateContext implements Processor {
-        private final Processor target;
-
-        public PropagateContext(Processor target) {
-            this.target = target;
-        }
-
-        @Override
-        public void process(Exchange exchange) throws Exception {
-            Span span = null;
-            OpenTelemetrySpanAdapter spanWrapper = (OpenTelemetrySpanAdapter) ActiveSpanManager.getSpan(exchange);
-            if (spanWrapper != null) {
-                span = spanWrapper.getOpenTelemetrySpan();
-            }
-
-            if (span == null) {
-                target.process(exchange);
-                return;
-            }
-
-            boolean activateExchange = !(target instanceof GetCorrelationContextProcessor
-                    || target instanceof SetCorrelationContextProcessor);
-
-            if (activateExchange) {
-                ActiveSpanManager.activate(exchange, new OpenTelemetrySpanAdapter(span));
-            }
-
-            try {
-                target.process(exchange);
-            } catch (Exception ex) {
-                span.setStatus(StatusCode.ERROR);
-                span.recordException(ex);
-                throw ex;
-            } finally {
-                if (activateExchange) {
-                    ActiveSpanManager.deactivate(exchange);
-                }
             }
         }
     }

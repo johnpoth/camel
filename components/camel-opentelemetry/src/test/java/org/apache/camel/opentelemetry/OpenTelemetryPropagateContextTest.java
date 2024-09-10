@@ -34,6 +34,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.apache.camel.opentelemetry.OpenTelemetryTracer.getHolder;
 import static org.apache.camel.test.junit5.TestSupport.fileUri;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -83,7 +84,10 @@ public class OpenTelemetryPropagateContextTest extends CamelOpenTelemetryTestSup
             public void configure() {
                 from(fileUri(tempDirectory)).routeId("serviceA")
                         .process(exchange -> {
-                            longRunningProcess();
+                            OpenTelemetryTracer.Holder holder = getHolder(exchange);
+                            try (Scope ignored = holder.getContext().makeCurrent()) {
+                                longRunningProcess();
+                            }
                         }).id("longRunningProcess")
                         .delay(simple("${random(0,500)}")).id("delayed");
             }

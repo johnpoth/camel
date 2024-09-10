@@ -23,6 +23,7 @@ import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.baggage.BaggageBuilder;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
+import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import org.apache.camel.tracing.SpanAdapter;
 import org.apache.camel.tracing.Tag;
@@ -43,16 +44,12 @@ public class OpenTelemetrySpanAdapter implements SpanAdapter {
         TAG_MAP.put(Tag.MESSAGE_BUS_DESTINATION, "message_bus.destination");
     }
 
-    private Baggage baggage;
+    private OpenTelemetryTracer.Holder holder;
     private io.opentelemetry.api.trace.Span span;
 
-    OpenTelemetrySpanAdapter(io.opentelemetry.api.trace.Span span) {
-        this.span = span;
-    }
-
-    OpenTelemetrySpanAdapter(io.opentelemetry.api.trace.Span span, Baggage baggage) {
-        this.span = span;
-        this.baggage = baggage;
+    OpenTelemetrySpanAdapter(OpenTelemetryTracer.Holder holder) {
+        this.span = Span.fromContext(holder.getContext());
+        this.holder = holder;
     }
 
     io.opentelemetry.api.trace.Span getOpenTelemetrySpan() {
@@ -153,25 +150,19 @@ public class OpenTelemetrySpanAdapter implements SpanAdapter {
     }
 
     public Baggage getBaggage() {
-        return this.baggage;
+        return holder.getBaggage();
     }
 
     public void setBaggage(Baggage baggage) {
-        this.baggage = baggage;
+        this.holder.setBaggage(baggage);
     }
 
     public void setCorrelationContextItem(String key, String value) {
-        BaggageBuilder builder = Baggage.builder();
-        if (baggage != null) {
-            builder = Baggage.current().toBuilder();
-        }
-        baggage = builder.put(key, value).build();
+        BaggageBuilder builder = this.holder.getBaggage().toBuilder().put(key, value);
+        this.holder.setBaggage(builder.build());
     }
 
     public String getContextPropagationItem(String key) {
-        if (baggage != null) {
-            return baggage.getEntryValue(key);
-        }
-        return null;
+        return this.holder.getBaggage().getEntryValue(key);
     }
 }

@@ -24,10 +24,11 @@ import org.apache.camel.Traceable;
 import org.apache.camel.spi.IdAware;
 import org.apache.camel.spi.RouteIdAware;
 import org.apache.camel.support.AsyncProcessorSupport;
-import org.apache.camel.tracing.ActiveSpanManager;
 import org.apache.camel.util.ObjectHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.apache.camel.opentelemetry.OpenTelemetryTracer.getAdapter;
 
 /**
  * A processor which adds a attribute on the active {@link io.opentelemetry.api.trace.Span} with an
@@ -50,8 +51,8 @@ public class AttributeProcessor extends AsyncProcessorSupport implements Traceab
     @Override
     public boolean process(Exchange exchange, AsyncCallback callback) {
         try {
-            OpenTelemetrySpanAdapter camelSpan = (OpenTelemetrySpanAdapter) ActiveSpanManager.getSpan(exchange);
-            Span span = camelSpan.getOpenTelemetrySpan();
+            OpenTelemetrySpanAdapter adapter = getAdapter(exchange);
+            Span span = adapter.getOpenTelemetrySpan();
             if (span != null) {
                 String tag = expression.evaluate(exchange, String.class);
                 span.setAttribute(attributeName, tag);

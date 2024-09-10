@@ -23,7 +23,6 @@ import org.apache.camel.Traceable;
 import org.apache.camel.spi.IdAware;
 import org.apache.camel.spi.RouteIdAware;
 import org.apache.camel.support.AsyncProcessorSupport;
-import org.apache.camel.tracing.ActiveSpanManager;
 import org.apache.camel.util.ObjectHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +44,7 @@ public class SetCorrelationContextProcessor extends AsyncProcessorSupport implem
     @Override
     public boolean process(Exchange exchange, AsyncCallback callback) {
         try {
-            OpenTelemetrySpanAdapter camelSpan = (OpenTelemetrySpanAdapter) ActiveSpanManager.getSpan(exchange);
+            OpenTelemetrySpanAdapter camelSpan = OpenTelemetryTracer.getAdapter(exchange);
             if (camelSpan != null) {
                 String item = expression.evaluate(exchange, String.class);
                 camelSpan.setCorrelationContextItem(baggageName, item);
