@@ -27,6 +27,7 @@ import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.ContextPropagators;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
@@ -294,9 +295,10 @@ public class OpenTelemetryTracer extends ServiceSupport implements CamelTracingS
             context = Context.root();
         }
         // start span
-        Span span = builder.setParent(context).startSpan();
-        // create new Context
-        return context.with(span);
+        try (Scope ignored = context.makeCurrent()) {
+            Span span = builder.setParent(context).startSpan();
+            return context.with(span);
+        }
     }
 
     protected void inject(Holder holder, InjectAdapter adapter) {
@@ -369,7 +371,9 @@ public class OpenTelemetryTracer extends ServiceSupport implements CamelTracingS
         Holder holder = getHolder(exchange);
         if (holder != null) {
             OpenTelemetrySpanAdapter span = getAdapter(holder);
-            span.getOpenTelemetrySpan().end();
+            try (Scope ignored = holder.getContext().makeCurrent()) {
+                span.getOpenTelemetrySpan().end();
+            }
             unsetHolder(exchange, holder);
         } else {
             LOG.warn("No span found in exchange {}", exchange);
